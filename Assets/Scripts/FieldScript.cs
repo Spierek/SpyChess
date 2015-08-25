@@ -4,6 +4,11 @@ using System.Collections;
 public struct Position {
     public int x;
     public int y;
+
+    public Position(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 }
 
 public class FieldScript : MonoBehaviour {
@@ -21,10 +26,22 @@ public class FieldScript : MonoBehaviour {
     #endregion
 
     #region Methods
-    public void Set(int x, int y) {
+    public void Initialize(int x, int y) {
         gameObject.name = "Cell " + x + "," + y;
         pos.x = x;
         pos.y = y;
+    }
+
+    public void Occupy(Piece piece) {
+        occupied = true;
+        currentPiece = piece;
+
+        // TODO: set sprite based on type
+    }
+
+    public void Free() {
+        occupied = false;
+        currentPiece = null;
     }
     #endregion
 }

@@ -27,6 +27,9 @@ public class GridGenerator : MonoBehaviour {
     public FieldScript GetField(int x, int y) {
         return grid[x, y];
     }
+    public FieldScript GetField(Position pos) {
+        return grid[pos.x, pos.y];
+    }
 
     private void Generate() {
         float offset = ((GridSize - 1f) / (GridSize * 2f));
@@ -34,18 +37,18 @@ public class GridGenerator : MonoBehaviour {
         // generate grid
         for (int i = 0; i < GridSize; ++i) {
             for (int j = 0; j < GridSize; ++j) {
-                // spawn new cell
+                // spawn new field
                 GameObject go = Instantiate(fieldPrefab) as GameObject;
-                go.transform.parent = transform;
 
                 grid[i, j] = go.GetComponent<FieldScript>();
-                grid[i, j].Set(i, j);
+                grid[i, j].Initialize(i, j);
 
                 // spread out cells
                 Vector2 pos = new Vector2(
                     (((float)i / GridSize) - offset) * gridSpacing,
                     (((float)j / GridSize) - offset) * gridSpacing);
                 go.transform.localPosition = pos;
+                go.transform.parent = transform;
             }            
         }
     }
