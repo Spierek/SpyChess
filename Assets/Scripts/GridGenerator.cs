@@ -24,7 +24,7 @@ public class GridGenerator : MonoBehaviour {
     #endregion
 
     #region Methods
-    public FieldScript GetGridCell(int x, int y) {
+    public FieldScript GetField(int x, int y) {
         return grid[x, y];
     }
 
@@ -45,7 +45,6 @@ public class GridGenerator : MonoBehaviour {
                 Vector2 pos = new Vector2(
                     (((float)i / GridSize) - offset) * gridSpacing,
                     (((float)j / GridSize) - offset) * gridSpacing);
-                Debug.Log(pos);
                 go.transform.localPosition = pos;
             }            
         }
