@@ -59,11 +59,15 @@ public class Piece : MonoBehaviour {
     #region Methods
     public void Set(PlayerType p, PieceType t, Position pos) {
         player = p;
-        type = t;
         currentPos = pos;
+        SetType(t);
 
-        sr.sprite = pieceSprites[(int)t];
         transform.position = GameController.Instance.board.GetField(currentPos.x, currentPos.y).transform.position;
+    }
+
+    public void SetType(PieceType t) {
+        type = t;
+        sr.sprite = pieceSprites[(int)t];
     }
 
     public void Move(FieldScript newField) {

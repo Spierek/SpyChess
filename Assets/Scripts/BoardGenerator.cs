@@ -11,7 +11,6 @@ public class BoardGenerator : MonoBehaviour {
     [SerializeField]
     private GameObject      piecePrefab;
 
-
     public float            gridSpacing = 5.75f;
 
     private FieldScript[,]  grid = new FieldScript[GridSize, GridSize];
@@ -19,12 +18,11 @@ public class BoardGenerator : MonoBehaviour {
 
     #region Monobehaviour
     private void Awake () {
-        Generate();
+        GenerateGrid();
+        SetupPieces();
     }
 
     private void Start() {
-        GameObject go = Instantiate(piecePrefab) as GameObject;
-        go.GetComponent<Piece>().Set(PlayerType.Black, PieceType.King, new Position(3, 3));
     }
     
     private void Update () {
@@ -40,7 +38,8 @@ public class BoardGenerator : MonoBehaviour {
         return grid[pos.x, pos.y];
     }
 
-    private void Generate() {
+    private void GenerateGrid() {
+        Transform dir = transform.Find("Grid");
         float offset = ((GridSize - 1f) / (GridSize * 2f));
 
         // generate grid
@@ -57,9 +56,33 @@ public class BoardGenerator : MonoBehaviour {
                     (((float)i / GridSize) - offset) * gridSpacing,
                     -(((float)j / GridSize) - offset) * gridSpacing);
                 go.transform.localPosition = pos;
-                go.transform.parent = transform;
+                go.transform.parent = dir;
             }            
         }
+    }
+
+    private void SetupPieces() {
+        Transform dir = transform.Find("Pieces");
+        // spawn spies
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < GridSize; j++) {
+                SpawnPiece(PlayerType.Black, PieceType.Spy, new Position(j, i), dir);
+                SpawnPiece(PlayerType.White, PieceType.Spy, new Position(j, GridSize - i - 1), dir);
+            }        
+        }
+
+        // exception: set king pieces
+        GameController.Instance.board.GetField(3, 0).currentPiece.SetType(PieceType.King);
+        GameController.Instance.board.GetField(4, 7).currentPiece.SetType(PieceType.King);
+    }
+
+    private void SpawnPiece(PlayerType p, PieceType t, Position pos, Transform parent) {
+        GameObject go = Instantiate(piecePrefab) as GameObject;
+        Piece piece = go.GetComponent<Piece>();
+        go.transform.parent = parent;
+        
+        piece.Set(p, t, pos);
+        GameController.Instance.board.GetField(pos).Occupy(piece);
     }
     #endregion
 }
