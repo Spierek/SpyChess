@@ -12,7 +12,7 @@ public class GameController : MonoBehaviour {
     #region Variables
     public static GameController Instance;
 
-    public GridGenerator grid;
+    public BoardGenerator board;
     #endregion
 
     #region Monobehaviour

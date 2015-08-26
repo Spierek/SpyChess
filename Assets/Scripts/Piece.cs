@@ -48,11 +48,11 @@ public class Piece : MonoBehaviour {
             newPos.x++; moved = true;
         }
 
-        newPos.x = Mathf.Clamp(newPos.x, 0, GridGenerator.GridSize);
-        newPos.y = Mathf.Clamp(newPos.y, 0, GridGenerator.GridSize);
+        newPos.x = Mathf.Clamp(newPos.x, 0, BoardGenerator.GridSize - 1);
+        newPos.y = Mathf.Clamp(newPos.y, 0, BoardGenerator.GridSize - 1);
 
         if (moved)
-            Move(GameController.Instance.grid.GetField(newPos));
+            Move(GameController.Instance.board.GetField(newPos));
     }
     #endregion
 
@@ -63,10 +63,11 @@ public class Piece : MonoBehaviour {
         currentPos = pos;
 
         sr.sprite = pieceSprites[(int)t];
+        transform.position = GameController.Instance.board.GetField(currentPos.x, currentPos.y).transform.position;
     }
 
     public void Move(FieldScript newField) {
-        FieldScript currentField = GameController.Instance.grid.GetField(currentPos.x, currentPos.y);
+        FieldScript currentField = GameController.Instance.board.GetField(currentPos.x, currentPos.y);
 
         currentField.Free();
         newField.Occupy(this);
@@ -74,7 +75,7 @@ public class Piece : MonoBehaviour {
         currentPos = newField.pos;
 
         // animate movement
-        transform.DOMove(newField.transform.position, 1f).SetEase(Ease.InOutCubic);
+        transform.DOMove(newField.transform.position, 0.5f).SetEase(Ease.InOutCubic);
     }
 
     public void Kill() {
@@ -84,12 +85,12 @@ public class Piece : MonoBehaviour {
 
     public List<Position> GetMovementOptions() {
         List<Position> moves = new List<Position>();
-        GridGenerator grid = GameController.Instance.grid;
+        BoardGenerator board = GameController.Instance.board;
 
-        for (int i = 0; i < GridGenerator.GridSize; ++i) {
-            for (int j = 0; j < GridGenerator.GridSize; ++j) {
+        for (int i = 0; i < BoardGenerator.GridSize; ++i) {
+            for (int j = 0; j < BoardGenerator.GridSize; ++j) {
                 // add all viable moves to move list
-                if (CheckMovement(grid.GetField(i, j))) {
+                if (CheckMovement(board.GetField(i, j))) {
                     moves.Add(new Position(i, j));
                 }
             }
@@ -99,7 +100,7 @@ public class Piece : MonoBehaviour {
     }
 
     public bool CheckMovement(FieldScript field) {
-        if (field == GameController.Instance.grid.GetField(currentPos))
+        if (field == GameController.Instance.board.GetField(currentPos))
             return false;
 
         if (field.occupied && field.currentPiece.player == player)

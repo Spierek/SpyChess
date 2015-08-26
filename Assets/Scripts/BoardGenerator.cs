@@ -2,13 +2,17 @@
 using System;
 using System.Collections;
 
-public class GridGenerator : MonoBehaviour {
+public class BoardGenerator : MonoBehaviour {
     #region Variables
     public static int       GridSize = 8;
 
     [SerializeField]
     private GameObject      fieldPrefab;
-    public float            gridSpacing = 5;
+    [SerializeField]
+    private GameObject      piecePrefab;
+
+
+    public float            gridSpacing = 5.75f;
 
     private FieldScript[,]  grid = new FieldScript[GridSize, GridSize];
     #endregion
@@ -16,6 +20,11 @@ public class GridGenerator : MonoBehaviour {
     #region Monobehaviour
     private void Awake () {
         Generate();
+    }
+
+    private void Start() {
+        GameObject go = Instantiate(piecePrefab) as GameObject;
+        go.GetComponent<Piece>().Set(PlayerType.Black, PieceType.King, new Position(3, 3));
     }
     
     private void Update () {
