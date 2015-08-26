@@ -2,25 +2,82 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 
-public abstract class Piece {
+public enum PieceType {
+    Spy,
+    Pawn,
+    Rook,
+    Knight,
+    Bishop,
+    Queen,
+    King
+}
+
+public class Piece : MonoBehaviour {
     #region Variables
     public Position     currentPos;
     public PlayerType   player;
+    public PieceType    type;
+
+    public Sprite[]     pieceSprites = new Sprite[7];
+
+    private SpriteRenderer sr;
+    #endregion
+
+    #region Monobehaviour
+    private void Awake() {
+        sr = transform.Find("Sprite").GetComponent<SpriteRenderer>();
+    }
+
+    private void Update() {
+        // MOVEMENT TEST
+        Position newPos = new Position(currentPos);
+        bool moved = false;
+
+        if (Input.GetKeyDown(KeyCode.UpArrow)) {
+            newPos.y--; moved = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow)) {
+            newPos.y++; moved = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+            newPos.x--; moved = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow)) {
+            newPos.x++; moved = true;
+        }
+
+        newPos.x = Mathf.Clamp(newPos.x, 0, GridGenerator.GridSize);
+        newPos.y = Mathf.Clamp(newPos.y, 0, GridGenerator.GridSize);
+
+        if (moved)
+            Move(GameController.Instance.grid.GetField(newPos));
+    }
     #endregion
 
     #region Methods
+    public void Set(PlayerType p, PieceType t, Position pos) {
+        player = p;
+        type = t;
+        currentPos = pos;
+
+        sr.sprite = pieceSprites[(int)t];
+    }
+
     public void Move(FieldScript newField) {
         FieldScript currentField = GameController.Instance.grid.GetField(currentPos.x, currentPos.y);
 
         currentField.Free();
         newField.Occupy(this);
 
-        currentPos.x = newField.pos.x;
-        currentPos.y = newField.pos.y;
+        currentPos = newField.pos;
+
+        // animate movement
+        transform.DOMove(newField.transform.position, 1f).SetEase(Ease.InOutCubic);
     }
 
-    public virtual void Kill() {
+    public void Kill() {
         // TODO: remove from board
         // TODO: check if king
     }
@@ -48,14 +105,25 @@ public abstract class Piece {
         if (field.occupied && field.currentPiece.player == player)
             return false;
 
-        if (!CheckMovementRule(field.pos.x, field.pos.y))
+        if (!CheckMovementRules(field.pos))
             return false;
 
         return true;
     }
 
-    // overloadable method for child classes
-    // used to check if a certain pawn type can reach the destination
-    protected abstract bool CheckMovementRule(int newX, int newY);
+    // TODO: implement missing rules
+    private bool CheckMovementRules(Position newPos) {
+        switch (type) {
+            default: return MovementRulesKing(newPos);
+        }   
+    }
+
+    private bool MovementRulesKing(Position newPos) {
+        if ((newPos.x == currentPos.x || newPos.x == currentPos.x - 1 || newPos.x == currentPos.x - 1)
+            && (newPos.y == currentPos.y || newPos.y == currentPos.y - 1 || newPos.y == currentPos.y - 1))
+            return true;
+
+        return false;
+    }
     #endregion
 }

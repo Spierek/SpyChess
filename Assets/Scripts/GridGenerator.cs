@@ -46,7 +46,7 @@ public class GridGenerator : MonoBehaviour {
                 // spread out cells
                 Vector2 pos = new Vector2(
                     (((float)i / GridSize) - offset) * gridSpacing,
-                    (((float)j / GridSize) - offset) * gridSpacing);
+                    -(((float)j / GridSize) - offset) * gridSpacing);
                 go.transform.localPosition = pos;
                 go.transform.parent = transform;
             }            
