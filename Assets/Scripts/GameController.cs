@@ -16,7 +16,7 @@ public class GameController : MonoBehaviour {
 
     [Space(10)]
     public PlayerType       currentPlayer;
-
+    public int              turnCounter;
     #endregion
 
     #region Monobehaviour
@@ -31,5 +31,11 @@ public class GameController : MonoBehaviour {
     #endregion
 
     #region Methods
+    public void NextTurn() {
+        currentPlayer = currentPlayer == PlayerType.White ? PlayerType.Black : PlayerType.White;
+        
+        if (currentPlayer == PlayerType.White)
+            turnCounter++;
+    }
     #endregion
 }

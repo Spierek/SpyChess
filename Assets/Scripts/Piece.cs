@@ -19,7 +19,7 @@ public enum PieceType {
 public class Piece : MonoBehaviour {
     #region Variables
     public Position     currentPos;
-    public PlayerType   player;
+    public PlayerType   owner;
     public PieceType    type;
     public bool         selected;
 
@@ -72,7 +72,7 @@ public class Piece : MonoBehaviour {
 
     #region Methods
     public void Set(PlayerType p, PieceType t, Position pos) {
-        player = p;
+        owner = p;
         currentPos = pos;
         SetType(t);
 
@@ -83,8 +83,11 @@ public class Piece : MonoBehaviour {
         spriteRenderer.sprite = pieceSprites[(int)t];
     }
 
+    // TODO: check if there's only one item selected
     public void Select(object sender, EventArgs e) {
-        // TODO: check if there's only one item selected
+        if (GameController.Instance.currentPlayer != owner)
+            return;
+
         selected = !selected;
         selectionRenderer.enabled = selected;
 
@@ -103,6 +106,8 @@ public class Piece : MonoBehaviour {
 
         // animate movement
         transform.DOMove(newField.transform.position, 0.5f).SetEase(Ease.InOutCubic);
+
+        GameController.Instance.NextTurn();
     }
 
     public void Kill() {
@@ -130,7 +135,7 @@ public class Piece : MonoBehaviour {
         if (field == GameController.Instance.board.GetField(currentPos))
             return false;
 
-        if (field.occupied && field.currentPiece.player == player)
+        if (field.occupied && field.currentPiece.owner == owner)
             return false;
 
         if (!CheckMovementRules(field.pos))
