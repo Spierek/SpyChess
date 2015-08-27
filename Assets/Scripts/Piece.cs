@@ -26,7 +26,7 @@ public class Piece : MonoBehaviour {
     [Space(10)]
     public GameObject   moveFieldPrefab;
     public GameObject   attackFieldPrefab;
-    public Sprite[]     pieceSprites = new Sprite[7];
+    public Sprite[]     pieceSprites = new Sprite[14];
 
     private List<ActionField> actionFields = new List<ActionField>();
 
@@ -86,7 +86,9 @@ public class Piece : MonoBehaviour {
     }
     public void SetType(PieceType t) {
         type = t;
-        spriteRenderer.sprite = pieceSprites[(int)t];
+
+        // offset 7 for black sprites
+        spriteRenderer.sprite = pieceSprites[(int)t + (owner == PlayerType.Black ? 7 : 0)];
     }
 
     // SELECTION / TOUCH
