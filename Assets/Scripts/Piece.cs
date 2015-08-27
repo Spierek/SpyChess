@@ -181,9 +181,10 @@ public class Piece : MonoBehaviour {
     }
 
     private bool MovementRulesKing(Position newPos) {
-        if ((newPos.x == currentPos.x || newPos.x == currentPos.x - 1 || newPos.x == currentPos.x - 1)
-            && (newPos.y == currentPos.y || newPos.y == currentPos.y - 1 || newPos.y == currentPos.y - 1))
+        if ((newPos.x == currentPos.x || newPos.x == currentPos.x - 1 || newPos.x == currentPos.x + 1)
+            && (newPos.y == currentPos.y || newPos.y == currentPos.y - 1 || newPos.y == currentPos.y + 1)) {
             return true;
+        }
 
         return false;
     }
