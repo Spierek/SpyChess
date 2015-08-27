@@ -23,7 +23,12 @@ public class Piece : MonoBehaviour {
     public PieceType    type;
     public bool         selected;
 
+    [Space(10)]
+    public GameObject   moveFieldPrefab;
+    public GameObject   attackFieldPrefab;
     public Sprite[]     pieceSprites = new Sprite[7];
+
+    private List<ActionField> actionFields = new List<ActionField>();
 
     private SpriteRenderer spriteRenderer;
     private SpriteRenderer selectionRenderer;
@@ -62,15 +67,16 @@ public class Piece : MonoBehaviour {
     }
 
     private void OnEnable() {
-        GetComponent<TapGesture>().Tapped += Select;
+        GetComponent<TapGesture>().Tapped += CheckSelection;
     }
 
     private void OnDisable() {
-        GetComponent<TapGesture>().Tapped -= Select;
+        GetComponent<TapGesture>().Tapped -= CheckSelection;
     }
     #endregion
 
     #region Methods
+    // SETUP
     public void Set(PlayerType p, PieceType t, Position pos) {
         owner = p;
         currentPos = pos;
@@ -83,19 +89,31 @@ public class Piece : MonoBehaviour {
         spriteRenderer.sprite = pieceSprites[(int)t];
     }
 
-    // TODO: check if there's only one item selected
-    public void Select(object sender, EventArgs e) {
+    // SELECTION / TOUCH
+    public void CheckSelection(object sender, EventArgs e) {
         if (GameController.Instance.currentPlayer != owner)
             return;
 
-        selected = !selected;
-        selectionRenderer.enabled = selected;
-
-        if (selected) {
-            GetMovementOptions();
-        }
+        if (!selected)
+            Select();
+        else
+            Deselect();
     }
 
+    // TODO: check if there's only one item selected
+    public void Select() {
+        selected = true;
+        selectionRenderer.enabled = true;
+        SpawnActionFields();
+    }
+
+    public void Deselect() {
+        selected = false;
+        selectionRenderer.enabled = false;
+        DestroyActionFields();
+    }
+
+    // INTERACTION
     public void Move(FieldScript newField) {
         FieldScript currentField = GameController.Instance.board.GetField(currentPos.x, currentPos.y);
 
@@ -108,6 +126,7 @@ public class Piece : MonoBehaviour {
         transform.DOMove(newField.transform.position, 0.5f).SetEase(Ease.InOutCubic);
 
         GameController.Instance.NextTurn();
+        Deselect();
     }
 
     public void Kill() {
@@ -115,23 +134,33 @@ public class Piece : MonoBehaviour {
         // TODO: check if king
     }
 
-    public List<Position> GetMovementOptions() {
-        List<Position> moves = new List<Position>();
+    // TODO: pool action fields
+    private void SpawnActionFields() {
         BoardGenerator board = GameController.Instance.board;
 
         for (int i = 0; i < BoardGenerator.GridSize; ++i) {
             for (int j = 0; j < BoardGenerator.GridSize; ++j) {
                 // add all viable moves to move list
                 if (CheckMovement(board.GetField(i, j))) {
-                    moves.Add(new Position(i, j));
+                    GameObject go = Instantiate(moveFieldPrefab);
+                    MoveField mf = go.GetComponent<MoveField>();
+                    
+                    mf.Set(this, board.GetField(i, j));
+                    actionFields.Add(mf);
                 }
             }
         }
-
-        return moves;
     }
 
-    public bool CheckMovement(FieldScript field) {
+    private void DestroyActionFields() {
+        for (int i = 0; i < actionFields.Count; i++) {
+            Destroy(actionFields[i].gameObject);
+        }
+        actionFields.Clear();
+    }
+
+    // MOVEMENT
+    private bool CheckMovement(FieldScript field) {
         if (field == GameController.Instance.board.GetField(currentPos))
             return false;
 
