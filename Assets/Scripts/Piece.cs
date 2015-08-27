@@ -3,6 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using TouchScript;
+using TouchScript.Gestures;
 
 public enum PieceType {
     Spy,
@@ -19,15 +21,19 @@ public class Piece : MonoBehaviour {
     public Position     currentPos;
     public PlayerType   player;
     public PieceType    type;
+    public bool         selected;
 
     public Sprite[]     pieceSprites = new Sprite[7];
 
-    private SpriteRenderer sr;
+    private SpriteRenderer spriteRenderer;
+    private SpriteRenderer selectionRenderer;
     #endregion
 
     #region Monobehaviour
     private void Awake() {
-        sr = transform.Find("Sprite").GetComponent<SpriteRenderer>();
+        spriteRenderer = transform.Find("Sprite").GetComponent<SpriteRenderer>();
+        selectionRenderer = transform.Find("Selection").GetComponent<SpriteRenderer>();
+        selectionRenderer.enabled = false;
     }
 
     private void Update() {
@@ -54,6 +60,14 @@ public class Piece : MonoBehaviour {
         if (moved)
             Move(GameController.Instance.board.GetField(newPos));
     }
+
+    private void OnEnable() {
+        GetComponent<TapGesture>().Tapped += Select;
+    }
+
+    private void OnDisable() {
+        GetComponent<TapGesture>().Tapped -= Select;
+    }
     #endregion
 
     #region Methods
@@ -64,10 +78,19 @@ public class Piece : MonoBehaviour {
 
         transform.position = GameController.Instance.board.GetField(currentPos.x, currentPos.y).transform.position;
     }
-
     public void SetType(PieceType t) {
         type = t;
-        sr.sprite = pieceSprites[(int)t];
+        spriteRenderer.sprite = pieceSprites[(int)t];
+    }
+
+    public void Select(object sender, EventArgs e) {
+        // TODO: check if there's only one item selected
+        selected = !selected;
+        selectionRenderer.enabled = selected;
+
+        if (selected) {
+            GetMovementOptions();
+        }
     }
 
     public void Move(FieldScript newField) {
