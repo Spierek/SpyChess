@@ -142,13 +142,22 @@ public class Piece : MonoBehaviour {
 
         for (int i = 0; i < BoardGenerator.GridSize; ++i) {
             for (int j = 0; j < BoardGenerator.GridSize; ++j) {
-                // add all viable moves to move list
-                if (CheckMovement(board.GetField(i, j))) {
-                    GameObject go = Instantiate(moveFieldPrefab);
-                    MoveField mf = go.GetComponent<MoveField>();
-                    
-                    mf.Set(this, board.GetField(i, j));
-                    actionFields.Add(mf);
+
+                FieldScript targetField = board.GetField(i, j);
+                if (CheckMovement(targetField)) {
+                    GameObject go;
+                    ActionField af;
+                    if (!targetField.occupied) {
+                        go = Instantiate(moveFieldPrefab);
+                        af = go.GetComponent<MoveField>();
+                    }
+                    else {
+                        go = Instantiate(attackFieldPrefab);
+                        af = go.GetComponent<AttackField>();
+                    }
+
+                    af.Set(this, targetField);
+                    actionFields.Add(af);
                 }
             }
         }
