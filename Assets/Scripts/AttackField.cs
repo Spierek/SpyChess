@@ -23,8 +23,9 @@ public class AttackField : ActionField {
         targetPiece = field.currentPiece;
     }
 
-    // TODO: implement attacking
     public override void Select(object sender, EventArgs e) {
+        targetPiece.Kill();
+        piece.Move(field);
     }
     #endregion
 }

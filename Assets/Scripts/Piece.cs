@@ -131,9 +131,10 @@ public class Piece : MonoBehaviour {
         Deselect();
     }
 
+    // TODO: check if king and trigger game over
     public void Kill() {
-        // TODO: remove from board
-        // TODO: check if king
+        GameController.Instance.board.GetField(currentPos).Free();
+        Destroy(gameObject);
     }
 
     // TODO: pool action fields
