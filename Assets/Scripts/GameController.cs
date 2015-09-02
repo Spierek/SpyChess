@@ -13,6 +13,7 @@ public class GameController : MonoBehaviour {
     public static GameController Instance;
 
     public BoardGenerator   board;
+    public UIManager        uiManager;
 
     [Space(10)]
     public int              turnCounter;
@@ -22,14 +23,17 @@ public class GameController : MonoBehaviour {
     public Piece            currentPiece;
     #endregion
 
+    #region Delegates
+    public delegate void OnNextTurnDelegate(int turns, PlayerType type);
+    public static event OnNextTurnDelegate OnNextTurn;
+    #endregion
+
     #region Monobehaviour
     private void Awake () {
         Instance = this;
         DOTween.Init(false, true, LogBehaviour.ErrorsOnly);
-    }
-    
-    private void Update () {
-    
+
+        turnCounter = 1;
     }
     #endregion
 
@@ -39,6 +43,9 @@ public class GameController : MonoBehaviour {
         
         if (currentPlayer == PlayerType.White)
             turnCounter++;
+
+        if (OnNextTurn != null)
+            OnNextTurn(turnCounter, currentPlayer);
     }
 
     public void SetCurrentPiece(Piece p) {
