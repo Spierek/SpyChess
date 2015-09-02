@@ -26,6 +26,9 @@ public class GameController : MonoBehaviour {
     #region Delegates
     public delegate void OnNextTurnDelegate(int turns, PlayerType type);
     public static event OnNextTurnDelegate OnNextTurn;
+
+    public delegate void OnPieceSelectionDelegate(bool selected);
+    public static event OnPieceSelectionDelegate OnPieceSelection;
     #endregion
 
     #region Monobehaviour
@@ -54,11 +57,17 @@ public class GameController : MonoBehaviour {
 
         currentPiece = p;
         isAnyPieceSelected = true;
+
+        if (OnPieceSelection != null)
+            OnPieceSelection(true);
     }
 
     public void UnsetCurrentPiece() {
         currentPiece = null;
         isAnyPieceSelected = false;
+
+        if (OnPieceSelection != null)
+            OnPieceSelection(false);
     }
 
     public void SetCurrentPieceType(PieceType type) {
