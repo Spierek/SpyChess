@@ -104,18 +104,21 @@ public class Piece : MonoBehaviour {
 
     // TODO: check if there's only one item selected
     public void Select() {
-        selected = true;
-        selectionRenderer.enabled = true;
         SpawnActionFields();
 
-        GameController.Instance.SetCurrentPiece(this);
+        // select only when there are available moves or the piece is a spy (and can be declared)
+        if (actionFields.Count > 0 || type == PieceType.Spy) {
+            selected = true;
+            selectionRenderer.enabled = true;
+            GameController.Instance.SetCurrentPiece(this);
+        }
     }
 
     public void Deselect() {
-        selected = false;
-        selectionRenderer.enabled = false;
         DestroyActionFields();
 
+        selected = false;
+        selectionRenderer.enabled = false;
         GameController.Instance.UnsetCurrentPiece();
     }
 
