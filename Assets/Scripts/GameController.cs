@@ -15,8 +15,11 @@ public class GameController : MonoBehaviour {
     public BoardGenerator   board;
 
     [Space(10)]
-    public PlayerType       currentPlayer;
     public int              turnCounter;
+    public PlayerType       currentPlayer;
+
+    public bool             isAnyPieceSelected;
+    public Piece            currentPiece;
     #endregion
 
     #region Monobehaviour
@@ -36,6 +39,19 @@ public class GameController : MonoBehaviour {
         
         if (currentPlayer == PlayerType.White)
             turnCounter++;
+    }
+
+    public void SetCurrentPiece(Piece p) {
+        if (isAnyPieceSelected)
+            currentPiece.Deselect();
+
+        currentPiece = p;
+        isAnyPieceSelected = true;
+    }
+
+    public void UnsetCurrentPiece() {
+        currentPiece = null;
+        isAnyPieceSelected = false;
     }
     #endregion
 }

@@ -107,12 +107,16 @@ public class Piece : MonoBehaviour {
         selected = true;
         selectionRenderer.enabled = true;
         SpawnActionFields();
+
+        GameController.Instance.SetCurrentPiece(this);
     }
 
     public void Deselect() {
         selected = false;
         selectionRenderer.enabled = false;
         DestroyActionFields();
+
+        GameController.Instance.UnsetCurrentPiece();
     }
 
     // INTERACTION
