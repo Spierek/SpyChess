@@ -11,12 +11,17 @@ public class UIManager : MonoBehaviour {
 
     [Header("Bottom UI")]
     public Button declarationButton;
+    public Button declarationRookButton;
+    public Button declarationKnightButton;
+    public Button declarationBishopButton;
+    public Button declarationQueenButton;
     #endregion
 
     #region Monobehaviour
     private void Start () {
         UpdateTopUI(GameController.Instance.turnCounter, GameController.Instance.currentPlayer);
         SetDeclarationButton(false);
+        SetDeclarationTypeButtons(false);
     }
     
     private void OnEnable() {
@@ -36,8 +41,16 @@ public class UIManager : MonoBehaviour {
         currentPlayerIndicator.text = (type == PlayerType.White) ? "White" : "Black";
     }
 
-    private void SetDeclarationButton(bool set) {
+    public void SetDeclarationButton(bool set) {
         declarationButton.interactable = set;
+    }
+
+    // TODO: check player type availability
+    public void SetDeclarationTypeButtons(bool set) {
+        declarationRookButton.interactable = set;
+        declarationKnightButton.interactable = set;
+        declarationBishopButton.interactable = set;
+        declarationQueenButton.interactable = set;
     }
     #endregion
 }
