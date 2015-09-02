@@ -53,5 +53,11 @@ public class GameController : MonoBehaviour {
         currentPiece = null;
         isAnyPieceSelected = false;
     }
+
+    public void SetCurrentPieceType(PieceType type) {
+        if (isAnyPieceSelected && currentPiece.type == PieceType.Spy) {
+            
+        }
+    }
     #endregion
 }
